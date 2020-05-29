@@ -1,0 +1,111 @@
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Main2Activity extends AppCompatActivity {
+
+
+    FirebaseDatabase database;
+    DatabaseReference reff;
+    Member member;
+    Button button;
+    Spinner spinner;
+    int maxid=0;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main2);
+
+
+        button = findViewById(R.id.button);
+        spinner = findViewById(R.id.spinner);
+        member = new Member();
+        reff = database.getInstance().getReference().child("Data ");
+
+        List<String> categories = new ArrayList<>();
+        categories.add(0, "choose month");
+        categories.add("january");
+        categories.add("february");
+        categories.add("March");
+        categories.add("april");
+        categories.add("may");
+        categories.add("june");
+        categories.add("august");
+        categories.add("sepetember");
+        categories.add("october");
+        categories.add("november");
+        categories.add("December");
+        ArrayAdapter<String> dataAdapter;
+        dataAdapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item,categories);
+
+        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        spinner.setAdapter(dataAdapter);
+
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                if (adapterView.getItemAtPosition(i).equals("choose event")) {
+
+                } else {
+                    String item = adapterView.getItemAtPosition(i).toString();
+
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+        reff.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists())
+                    maxid = (int) dataSnapshot.getChildrenCount();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                String spin = spinner.getSelectedItem().toString();
+                if (spinner != null){
+
+                    member.setSpinner(spin);
+                    Toast.makeText(Main2Activity.this, "Registration Successfull", Toast.LENGTH_LONG).show();
+                    //toast.show();
+
+                    reff.child(String.valueOf(maxid+1)).setValue(member);
+
+                }
+            }
+        });
+
+    }
+}
